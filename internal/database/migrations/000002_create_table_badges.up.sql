@@ -1,4 +1,4 @@
-create table badges (
+create table if not exists badges (
     id serial primary key ,
     title varchar(255) not null,
     release_date date,

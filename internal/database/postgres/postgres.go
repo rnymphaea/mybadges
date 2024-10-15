@@ -2,8 +2,14 @@ package postgres
 
 import (
 	"context"
+	"fmt"
+	"log"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"golang.org/x/crypto/bcrypt"
+
+	"mybadges/internal/database/models"
 )
 
 type Storage struct {
@@ -16,4 +22,36 @@ func New(path string) (*Storage, error) {
 		return nil, err
 	}
 	return &Storage{pool: pool}, nil
+}
+
+func (s *Storage) CreateUser(user models.User) error {
+	if exists, _ := s.userExists(user.Email); exists {
+		return fmt.Errorf("user with email %s already exists", user.Email)
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("error hashing password: %v", err)
+	}
+
+	_, err = s.pool.Exec(context.Background(),
+		"insert into users(id, email, password, created_at) values ($1, $2, $3, $4)",
+		user.ID,
+		user.Email,
+		hashedPassword,
+		user.CreatedAt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Storage) userExists(email string) (bool, error) {
+	var id uuid.UUID
+	err := s.pool.QueryRow(context.Background(), "select id from users where email = $1", email).Scan(&id)
+	if err != nil {
+		log.Println(err)
+		return false, err
+	}
+	return true, nil
 }

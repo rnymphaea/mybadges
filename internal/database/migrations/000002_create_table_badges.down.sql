@@ -1,1 +1,1 @@
-drop table badges;
+drop table if exists badges;

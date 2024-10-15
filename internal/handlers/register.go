@@ -1,0 +1,35 @@
+package handlers
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"time"
+
+	"mybadges/internal/database"
+	"mybadges/internal/database/models"
+)
+
+func Register(userRepo database.UserRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var user models.User
+		log.Println(r.Body)
+		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+			log.Println(err)
+			http.Error(w, "Incorrect data", http.StatusBadRequest)
+			return
+		} else {
+			user.ID = database.GenerateUUID()
+			user.CreatedAt = time.Now()
+			log.Println(user)
+		}
+
+		if err := userRepo.CreateUser(user); err != nil {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
+
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+
+	}
+}
