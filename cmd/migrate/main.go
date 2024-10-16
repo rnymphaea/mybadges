@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -11,6 +12,11 @@ import (
 )
 
 func main() {
+	up := flag.Bool("up", false, "Run migrations up")
+	down := flag.Bool("down", false, "Run migrations down")
+
+	flag.Parse()
+
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -23,10 +29,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := m.Down(); err != nil {
-		log.Fatal(err)
+
+	if *down {
+		if err := m.Down(); err != nil {
+			log.Fatal(err)
+		}
+		log.Println("migrations down completed")
 	}
-	if err := m.Up(); err != nil {
-		log.Fatal(err)
+	if *up || (!*up && !*down) {
+		if err := m.Up(); err != nil {
+			log.Fatal(err)
+		}
+		log.Println("migrations up completed")
 	}
+
 }
