@@ -8,6 +8,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(user models.User) error
+	CheckCredentials(email, password string) error
 }
 
 func GenerateUUID() uuid.UUID {

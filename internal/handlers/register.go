@@ -13,7 +13,6 @@ import (
 func Register(userRepo database.UserRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user models.User
-		log.Println(r.Body)
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			log.Println(err)
 			http.Error(w, "Incorrect data", http.StatusBadRequest)

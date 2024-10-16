@@ -2,14 +2,17 @@ package postgres
 
 import (
 	"context"
+	stderrors "errors"
 	"fmt"
 	"log"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 
 	"mybadges/internal/database/models"
+	"mybadges/internal/utils/errors"
 )
 
 type Storage struct {
@@ -54,4 +57,23 @@ func (s *Storage) userExists(email string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func (s *Storage) CheckCredentials(email, password string) error {
+	var hashedPassword string
+	err := s.pool.QueryRow(context.Background(), "select password from users where email = $1", email).Scan(&hashedPassword)
+	if err != nil {
+		if stderrors.Is(err, pgx.ErrNoRows) {
+			return errors.ErrUserNotFound
+		} else {
+			return errors.ErrCheckingPassword
+		}
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	if err != nil {
+		return errors.ErrInvalidCredentials
+	} else {
+		return nil
+	}
 }
