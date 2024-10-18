@@ -11,15 +11,17 @@ import (
 
 func main() {
 	cfg, err := config.LoadConfig()
-	//log.Println(cfg.JWT)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	databaseURL := config.GetDatabaseURL(cfg)
 	storage, err := postgres.New(databaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	r := router.NewRouter(storage, cfg)
+
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

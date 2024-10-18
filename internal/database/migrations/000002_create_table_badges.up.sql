@@ -1,8 +1,8 @@
 create table if not exists badges (
-    id serial primary key ,
+    id serial primary key,
     title varchar(255) not null,
-    release_date date,
     description text,
+    release_date date,
     image_url varchar(255) not null,
     price int,
     category_id int,
@@ -13,5 +13,6 @@ create table if not exists badges (
     height int,
     width int,
     thickness int,
-    coverage varchar(30)
+    coverage varchar(30),
+    fastening varchar(30)
 );
