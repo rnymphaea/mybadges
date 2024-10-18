@@ -20,9 +20,18 @@ type JWTConfig struct {
 	Lifetime time.Duration `mapstructure:"lifetime"`
 }
 
+type S3Config struct {
+	AccessKey string `mapstructure:"access_key"`
+	SecretKey string `mapstructure:"secret_key"`
+	Endpoint  string `mapstructure:"endpoint"`
+	Bucket    string `mapstructure:"bucket"`
+	Region    string `mapstructure:"region"`
+}
+
 type Config struct {
 	Database DatabaseConfig `mapstructure:"database"`
 	JWT      JWTConfig      `mapstructure:"jwt"`
+	S3       S3Config       `mapstructure:"s3"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -43,11 +52,15 @@ func LoadConfig() (*Config, error) {
 	return &config, nil
 }
 
-func GetDatabaseURL(config *Config) string {
+func (config *Config) GetDatabaseURL() string {
 	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		config.Database.Username,
 		config.Database.Password,
 		config.Database.Host,
 		config.Database.Port,
 		config.Database.DatabaseName)
+}
+
+func (config *Config) GetS3Config() *S3Config {
+	return &config.S3
 }
