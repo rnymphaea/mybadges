@@ -1,7 +1,7 @@
 package s3
 
 import (
-	"os"
+	"io"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -29,7 +29,7 @@ func New(akey, skey, ep, b, r string) *Storage {
 	}
 }
 
-func (s *Storage) UploadFile(filename string) (string, error) {
+func (s *Storage) UploadFile(file io.Reader, key string) (string, error) {
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(s.Region),
 		Credentials: credentials.NewStaticCredentials(s.AccessKey, s.SecretKey, ""),
@@ -40,15 +40,9 @@ func (s *Storage) UploadFile(filename string) (string, error) {
 
 	uploader := s3manager.NewUploader(sess)
 
-	file, err := os.Open(filename)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
 	result, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(s.Bucket),
-		Key:    aws.String(filename),
+		Key:    aws.String(key),
 		Body:   file,
 	})
 	if err != nil {

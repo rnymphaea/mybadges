@@ -6,6 +6,7 @@ import (
 
 	"mybadges/internal/config"
 	"mybadges/internal/database/postgres"
+	"mybadges/internal/database/s3"
 	"mybadges/internal/router"
 )
 
@@ -16,8 +17,8 @@ func main() {
 	}
 	log.Println("Config loaded")
 
-	//s3cfg := cfg.GetS3Config()
-	//s3storage := s3.New(s3cfg.AccessKey, s3cfg.SecretKey, s3cfg.Endpoint, s3cfg.Bucket, s3cfg.Region)
+	s3cfg := cfg.GetS3Config()
+	s3storage := s3.New(s3cfg.AccessKey, s3cfg.SecretKey, s3cfg.Endpoint, s3cfg.Bucket, s3cfg.Region)
 
 	databaseURL := cfg.GetDatabaseURL()
 	storage, err := postgres.New(databaseURL)
@@ -26,7 +27,7 @@ func main() {
 	}
 	defer storage.Close()
 
-	r := router.NewRouter(storage, cfg)
+	r := router.NewRouter(storage, cfg, s3storage)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

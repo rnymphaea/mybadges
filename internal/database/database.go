@@ -1,6 +1,8 @@
 package database
 
 import (
+	"io"
+
 	"github.com/google/uuid"
 
 	"mybadges/internal/database/models"
@@ -11,8 +13,12 @@ type UserRepository interface {
 	CheckCredentials(email, password string) error
 }
 
+type BadgeRepository interface {
+	AddBadge(badge models.Badge) error
+}
+
 type ImageRepository interface {
-	UploadFile(filename string) (string, error)
+	UploadFile(file io.Reader, key string) (string, error)
 }
 
 func GenerateUUID() uuid.UUID {

@@ -36,3 +36,10 @@ var coverages = map[string]string{
 	"горячая эмаль":  "hot enamel",
 	"краска":         "paint",
 }
+
+func GetMaterial(m string) string {
+	if v, ok := materials[m]; ok {
+		return v
+	}
+	return ""
+}

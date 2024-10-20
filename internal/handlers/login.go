@@ -21,8 +21,6 @@ func Login(userRepo database.UserRepository, cfg *config.Config) http.HandlerFun
 			log.Println(err)
 			http.Error(w, "Incorrect data", http.StatusBadRequest)
 			return
-		} else {
-
 		}
 
 		err := userRepo.CheckCredentials(user.Email, user.Password)

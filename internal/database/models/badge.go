@@ -8,13 +8,13 @@ import (
 
 type Badge struct {
 	ID           uuid.UUID `json:"id"`
+	UserID       uuid.UUID `json:"user_id"`
 	Title        string    `json:"title"`
 	Description  string    `json:"description"`
 	ReleaseDate  time.Time `json:"release_date"`
 	ImageURL     string    `json:"image_url"`
 	Price        int       `json:"price"`
 	CategoryID   uuid.UUID `json:"category_id"`
-	UserID       uuid.UUID `json:"user_id"`
 	CollectionID uuid.UUID `json:"collection_id"`
 	Material     string    `json:"material"`
 	Weight       int       `json:"weight"`
