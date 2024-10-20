@@ -22,7 +22,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	databaseURL := config.GetDatabaseURL(cfg)
+	databaseURL := cfg.GetDatabaseURL()
 	m, err := migrate.New(
 		"file://internal/database/migrations",
 		databaseURL)

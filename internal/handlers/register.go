@@ -20,7 +20,6 @@ func Register(userRepo database.UserRepository) http.HandlerFunc {
 		} else {
 			user.ID = database.GenerateUUID()
 			user.CreatedAt = time.Now()
-			log.Println(user)
 		}
 
 		if err := userRepo.CreateUser(user); err != nil {

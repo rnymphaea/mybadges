@@ -4,7 +4,6 @@ import (
 	"context"
 	stderrors "errors"
 	"fmt"
-	"log"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -53,7 +52,7 @@ func (s *Storage) userExists(email string) (bool, error) {
 	var id uuid.UUID
 	err := s.pool.QueryRow(context.Background(), "select id from users where email = $1", email).Scan(&id)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		return false, err
 	}
 	return true, nil
@@ -76,4 +75,8 @@ func (s *Storage) CheckCredentials(email, password string) error {
 	} else {
 		return nil
 	}
+}
+
+func (s *Storage) Close() {
+	s.pool.Close()
 }

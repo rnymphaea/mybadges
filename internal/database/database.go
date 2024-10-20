@@ -11,6 +11,10 @@ type UserRepository interface {
 	CheckCredentials(email, password string) error
 }
 
+type ImageRepository interface {
+	UploadFile(filename string) (string, error)
+}
+
 func GenerateUUID() uuid.UUID {
 	return uuid.New()
 }
