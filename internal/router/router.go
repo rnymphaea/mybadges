@@ -15,6 +15,7 @@ func NewRouter(db *postgres.Storage, cfg *config.Config, s3storage *s3.Storage, 
 	router.Use(mw.LoggingMW)
 	router.HandleFunc("/register", handlers.Register(db)).Methods("POST")
 	router.HandleFunc("/login", handlers.Login(db, cfg)).Methods("POST")
-	router.HandleFunc("/addbadge", handlers.UploadBadge(db, s3storage)).Methods("POST")
+	key := cfg.GetSecretKey()
+	router.HandleFunc("/addbadge", mw.AuthMW(key)(handlers.UploadBadge(db, s3storage))).Methods("POST")
 	return router
 }

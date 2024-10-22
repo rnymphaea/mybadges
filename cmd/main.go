@@ -27,8 +27,10 @@ func main() {
 		log.Fatal(err)
 	}
 	defer storage.Close()
+
 	var mw middleware.Middleware
 	mw.LoggingMW = middleware.LoggingMiddleware
+	mw.AuthMW = middleware.AuthMiddleware
 	r := router.NewRouter(storage, cfg, s3storage, mw)
 
 	log.Fatal(http.ListenAndServe(":8080", r))

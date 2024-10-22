@@ -4,8 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/google/uuid"
-
 	"mybadges/internal/database"
 	"mybadges/internal/database/models"
 	spec "mybadges/internal/utils/badge"
@@ -26,8 +24,9 @@ func UploadBadge(badgeRepo database.BadgeRepository, imageRepo database.ImageRep
 			return
 		}
 		defer file.Close()
+
 		badge := models.Badge{
-			ID: uuid.New(), // Генерация нового ID
+			ID: database.GenerateUUID(),
 			//UserID:      uuid.MustParse(r.FormValue("user_id")),
 			Title:       r.FormValue("title"),
 			Description: r.FormValue("description"),

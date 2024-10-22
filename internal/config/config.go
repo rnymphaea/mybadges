@@ -64,3 +64,7 @@ func (config *Config) GetDatabaseURL() string {
 func (config *Config) GetS3Config() *S3Config {
 	return &config.S3
 }
+
+func (config *Config) GetSecretKey() string {
+	return config.JWT.Secret
+}
