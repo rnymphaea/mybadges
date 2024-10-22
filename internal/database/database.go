@@ -11,6 +11,7 @@ import (
 type UserRepository interface {
 	CreateUser(user models.User) error
 	CheckCredentials(email, password string) error
+	GetUserIDByEmail(email string) (uuid.UUID, error)
 }
 
 type BadgeRepository interface {

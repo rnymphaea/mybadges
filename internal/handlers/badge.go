@@ -4,12 +4,14 @@ import (
 	"log"
 	"net/http"
 
+	"mybadges/internal/config"
 	"mybadges/internal/database"
 	"mybadges/internal/database/models"
+	"mybadges/internal/utils"
 	spec "mybadges/internal/utils/badge"
 )
 
-func UploadBadge(badgeRepo database.BadgeRepository, imageRepo database.ImageRepository) http.HandlerFunc {
+func UploadBadge(badgeRepo database.BadgeRepository, imageRepo database.ImageRepository, usersRepo database.UserRepository, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseMultipartForm(10 << 20) // 10 MB limit
 		if err != nil {
@@ -26,12 +28,10 @@ func UploadBadge(badgeRepo database.BadgeRepository, imageRepo database.ImageRep
 		defer file.Close()
 
 		badge := models.Badge{
-			ID: database.GenerateUUID(),
-			//UserID:      uuid.MustParse(r.FormValue("user_id")),
+			ID:          database.GenerateUUID(),
 			Title:       r.FormValue("title"),
 			Description: r.FormValue("description"),
 			//ReleaseDate: r.FormValue("release_date"),
-			//ImageURL:     imageURL,
 			//Price:        r.FormValue("price"),
 			//CategoryID:   uuid.MustParse(r.FormValue("category_id")),
 			//CollectionID: uuid.MustParse(r.FormValue("collection_id")),
@@ -44,18 +44,44 @@ func UploadBadge(badgeRepo database.BadgeRepository, imageRepo database.ImageRep
 			Fastening: r.FormValue("fastening"),
 		}
 
+		tokenString, err := utils.GetTokenFromHeader(r)
+		if err != nil {
+			http.Error(w, "Unable to get token from header", http.StatusBadRequest)
+			log.Println(err)
+			return
+		}
+
+		secret := cfg.GetSecretKey()
+		email, err := utils.GetEmailFromToken(tokenString, secret)
+		if err != nil {
+			http.Error(w, "Unable to get email from token", http.StatusBadRequest)
+			log.Println(err)
+			return
+		}
+
+		id, err := usersRepo.GetUserIDByEmail(email)
+		if err != nil {
+			http.Error(w, "Unable to get user id by email", http.StatusBadRequest)
+			log.Println(err)
+			return
+		}
+
+		badge.UserID = id
+
 		if err = badgeRepo.AddBadge(badge); err != nil {
 			http.Error(w, "Unable to add badge", http.StatusInternalServerError)
 			log.Println(err)
 			return
 		}
 
-		_, err = imageRepo.UploadFile(file, badge.Title)
+		url, err := imageRepo.UploadFile(file, badge.Title)
 		if err != nil {
 			http.Error(w, "Unable to add badge photo", http.StatusInternalServerError)
 			log.Println(err)
 			return
 		}
+		badge.ImageURL = url
+
 		log.Println(badge)
 	}
 }

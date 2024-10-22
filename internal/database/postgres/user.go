@@ -64,6 +64,19 @@ func (s *Storage) CheckCredentials(email, password string) error {
 	}
 }
 
+func (s *Storage) GetUserIDByEmail(email string) (uuid.UUID, error) {
+	var id uuid.UUID
+	err := s.pool.QueryRow(context.Background(), "select id from users where email = $1", email).Scan(&id)
+	if err != nil {
+		if stderrors.Is(err, pgx.ErrNoRows) {
+			return uuid.Nil, errors.ErrUserNotFound
+		} else {
+			return uuid.Nil, errors.ErrGetUserByEmail
+		}
+	}
+	return id, nil
+}
+
 func (s *Storage) Close() {
 	s.pool.Close()
 }
