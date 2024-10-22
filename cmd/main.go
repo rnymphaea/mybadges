@@ -7,6 +7,7 @@ import (
 	"mybadges/internal/config"
 	"mybadges/internal/database/postgres"
 	"mybadges/internal/database/s3"
+	"mybadges/internal/middleware"
 	"mybadges/internal/router"
 )
 
@@ -26,8 +27,9 @@ func main() {
 		log.Fatal(err)
 	}
 	defer storage.Close()
-
-	r := router.NewRouter(storage, cfg, s3storage)
+	var mw middleware.Middleware
+	mw.LoggingMW = middleware.LoggingMiddleware
+	r := router.NewRouter(storage, cfg, s3storage, mw)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
