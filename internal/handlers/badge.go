@@ -31,8 +31,6 @@ func UploadBadge(badgeRepo database.BadgeRepository, imageRepo database.ImageRep
 			ID:          database.GenerateUUID(),
 			Title:       r.FormValue("title"),
 			Description: r.FormValue("description"),
-			//ReleaseDate: r.FormValue("release_date"),
-			//Price:        r.FormValue("price"),
 			//CategoryID:   uuid.MustParse(r.FormValue("category_id")),
 			//CollectionID: uuid.MustParse(r.FormValue("collection_id")),
 			Material: spec.GetMaterial(r.FormValue("material")),
