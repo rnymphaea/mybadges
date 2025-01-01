@@ -31,9 +31,10 @@ func New(akey, skey, ep, b, r string) *Storage {
 
 func (s *Storage) UploadFile(file io.Reader, key string) (string, error) {
 	sess, err := session.NewSession(&aws.Config{
-		Region:      aws.String(s.Region),
-		Credentials: credentials.NewStaticCredentials(s.AccessKey, s.SecretKey, ""),
-		Endpoint:    aws.String(s.Endpoint)})
+		Region:           aws.String(s.Region),
+		Credentials:      credentials.NewStaticCredentials(s.AccessKey, s.SecretKey, ""),
+		Endpoint:         aws.String(s.Endpoint),
+		S3ForcePathStyle: aws.Bool(true)})
 	if err != nil {
 		return "", errors.ErrNoSession
 	}
